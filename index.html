@@ -1,0 +1,792 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"><title>订单整理计算器</title><style>
+:root{--bg:#f2f3f7;--card:#fff;--primary:#3b5998;--primary-soft:#e9edf6;--accent:#5b7db5;--text:#1e2a3a;--muted:#6b7d95;--line:#e2e6ee;--success:#2f8f6b;--warn:#b37b00;--danger:#c84f4f;--shadow:0 2px 12px rgba(30,42,58,.07);--radius:14px;--radius-sm:10px;--safe-bottom:env(safe-area-inset-bottom,16px);--mono:'SF Mono','Menlo','Consolas','Courier New',monospace;--transition:.2s cubic-bezier(.4,0,.2,1)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}html,body{width:100%;max-width:100%;overflow-x:hidden}html{font-size:16px;-webkit-text-size-adjust:100%;text-size-adjust:100%}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh;padding-bottom:calc(96px + var(--safe-bottom));-webkit-font-smoothing:antialiased}button,textarea{font:inherit}.header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:16px 20px 13px;text-align:center;border-radius:0 0 var(--radius) var(--radius);box-shadow:0 1px 0 var(--line),var(--shadow)}.title{font-size:1.26rem;line-height:1.2;font-weight:750;color:var(--primary);letter-spacing:.02em}.subtitle{font-size:.75rem;color:var(--muted);margin-top:3px;letter-spacing:.03em}.shell{width:100%;max-width:760px;margin:0 auto;padding:12px 14px;display:flex;flex-direction:column;gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px;min-width:0}.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px;min-width:0}.card-title{font-size:.9rem;font-weight:700;color:var(--text);letter-spacing:.01em;display:flex;align-items:center;gap:7px}.step{display:inline-grid;place-items:center;width:23px;height:23px;border-radius:50%;background:var(--primary-soft);color:var(--primary);font-size:.75rem;font-weight:800}.btn{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 14px;border-radius:9px;font-size:.88rem;font-weight:650;white-space:nowrap;transition:var(--transition);user-select:none}.btn:active{transform:scale(.97)}.btn.primary{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(59,89,152,.24)}.btn.ghost{background:#fff;color:var(--primary);border:1.5px solid var(--line)}.btn.soft{background:#f5f7fb;color:#52647a;border:1px solid var(--line)}.btn.small{min-height:36px;padding:0 11px;font-size:.79rem}.quick-actions{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:8px;margin-bottom:10px}.quick-actions .btn{width:100%}.input-area{width:100%;min-height:210px;max-height:430px;resize:vertical;border:1.5px solid var(--line);border-radius:var(--radius-sm);background:#fafbfc;color:var(--text);padding:13px 14px;font-family:var(--mono);font-size:16px;line-height:1.7;outline:none;user-select:text;-webkit-user-select:text;transition:var(--transition)}.input-area:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(91,125,181,.09)}.parse-wrap{margin-top:10px}.parse-wrap .btn{width:100%;min-height:46px;font-size:.93rem}.segmented{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;background:#f0f2f7;border-radius:10px}.seg-btn{border:0;background:transparent;color:var(--muted);min-height:42px;padding:0 7px;border-radius:7px;font-weight:650;font-size:.86rem;cursor:pointer;white-space:nowrap}.seg-btn.active{background:#fff;color:var(--primary);box-shadow:0 1px 4px rgba(30,42,58,.10)}.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:11px}.metric{background:#fafbfc;border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0}.metric .k{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metric .v{font-size:1.08rem;font-weight:800;margin-top:3px;color:var(--text)}.result-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.result-actions .btn{width:100%}.view{display:none}.view.active{display:block}.group-list{display:flex;flex-direction:column;gap:10px}.group-card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 1px 5px rgba(30,42,58,.04)}.group-accent{height:4px;background:linear-gradient(90deg,var(--primary),var(--accent))}.group-card .body{padding:12px}.group-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:9px}.group-title{font-size:.96rem;font-weight:800;color:#233246;display:flex;align-items:center;gap:7px;flex-wrap:wrap}.group-meta{display:flex;gap:6px;flex-wrap:wrap}.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;border:1px solid var(--line);background:#f7f9fc;color:#516175;font-size:.74rem;font-weight:700}.chip.ok{background:#edfaf3;color:var(--success);border-color:#d6efdf}.chip.warn{background:#fff8e8;color:var(--warn);border-color:#f3e0b4}.chip.bad{background:#fff1f1;color:var(--danger);border-color:#f1cdcd}.divider{height:1px;background:#edf1f6;margin:10px 0}.formula{font-family:var(--mono);font-size:.82rem;line-height:1.6;word-break:break-word;overflow-wrap:anywhere;color:#324055}.formula strong{font-weight:800;color:var(--primary)}.calc-chip-list,.names{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.mini,.name-tag{font-size:.73rem;padding:4px 7px;border-radius:999px;background:#f5f7fb;border:1px solid var(--line);color:#5f6f83}.formula{background:#f9fbfe;border:1px dashed #d9e3f1;border-radius:10px;padding:9px 10px}.empty{padding:24px 12px;border:1px dashed var(--line);border-radius:11px;text-align:center;color:var(--muted);background:#fbfcfe;font-size:.88rem}.tuanchou-bar{position:fixed;left:0;right:0;bottom:0;z-index:120;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:10px 14px calc(10px + var(--safe-bottom));box-shadow:0 -4px 16px rgba(30,42,58,.05)}.tuanchou-inner{max-width:760px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:9px}.tuanchou-content{font-family:var(--mono);font-size:.77rem;line-height:1.45;word-break:break-word;max-height:42px;overflow:auto}.toast{position:fixed;left:50%;bottom:122px;transform:translateX(-50%);background:#1e2a3a;color:#fff;padding:8px 16px;border-radius:20px;font-size:.8rem;z-index:200;opacity:0;pointer-events:none;transition:.25s}.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+@media(max-width:600px){.shell{padding:10px}.card{padding:13px}.header{padding-top:15px}.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.card-head{align-items:flex-start}.seg-btn{font-size:.79rem}.quick-actions .btn{padding:0 7px;font-size:.76rem}.result-actions .btn{padding:0 8px;font-size:.8rem}}
+@media(max-width:370px){.quick-actions{grid-template-columns:1fr 1fr}.quick-actions .btn:first-child{grid-column:1/-1}.seg-btn{font-size:.74rem;padding:0 3px}}
+</style>    <meta name="AIGC" content='{"AIGC":{"Label":"2","ContentProducer":"WUSIGRAM","ProduceID":"SmD+h3qmApNVJLuPK9Ym0uNO6D35zXihLWc5XZ0kO+s=","ReservedCode1":"Hyuh6PlF+uELBfMsTrd+wb1P9vLf869C8RpQGKw5aNS3HWjgvwrN8KdaCQDo9yxR1BuCQfCqmkWLB6MdjfZEnw==","ContentPropagator":"","PropagateID":"","ReservedCode2":""}}'>
+</head><body>
+<header class="header">
+  <div class="title">订单整理计算器</div>
+  <div class="subtitle">定制联系🛰️srhovo</div>
+</header>
+<main class="shell">
+  <section class="card">
+    <div class="card-head"><div class="card-title"><span class="step">1</span>订单数据输入</div></div>
+    <div class="quick-actions">
+      <button class="btn ghost small" id="btnPasteAdd">📌 粘贴/追加</button>
+      <button class="btn soft small" id="btnLoadSample">加载示例</button>
+      <button class="btn soft small" id="btnClearInput">清空</button>
+    </div>
+    <textarea class="input-area" id="orderInput" placeholder="将整体订单模板粘贴到这里……"></textarea>
+    <div class="parse-wrap"><button class="btn primary" id="btnParse">解析并生成结账方案</button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><div class="card-title"><span class="step">2</span>选择结账模式</div></div>
+    <div class="segmented" id="modeSwitch">
+      <button class="seg-btn active" data-mode="common">常规结账</button>
+      <button class="seg-btn" data-mode="project">同项目结账</button>
+      <button class="seg-btn" data-mode="smart">智能结账</button>
+    </div>
+    <div class="summary" id="summaryGrid">
+      <div class="metric"><div class="k">订单数量</div><div class="v" id="metricOrders">0</div></div>
+      <div class="metric"><div class="k">陪玩人数</div><div class="v" id="metricPeople">0</div></div>
+      <div class="metric"><div class="k">当前分组</div><div class="v" id="metricGroups">0</div></div>
+      <div class="metric"><div class="k">智能状态</div><div class="v" id="metricSmart">-</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><div class="card-title"><span class="step">3</span>查看并执行结账</div></div>
+    <div class="result-actions">
+      <button class="btn primary small" id="btnCopySummary">📋 复制结账文案</button>
+      <button class="btn ghost small" id="btnExport">📥 导出当前结果</button>
+    </div>
+    <div id="view-common" class="view active"><div class="group-list" id="commonList"><div class="empty">暂无数据。请先粘贴订单并解析。</div></div></div>
+    <div id="view-project" class="view"><div class="group-list" id="projectList"><div class="empty">暂无数据。请先粘贴订单并解析。</div></div></div>
+    <div id="view-smart" class="view"><div class="group-list" id="smartList"><div class="empty">暂无数据。请先粘贴订单并解析。</div></div></div>
+  </section>
+</main>
+<div class="tuanchou-bar" id="tuanchouBar"><div class="tuanchou-inner"><div class="tuanchou-content" id="tuanchouContent">团抽总和 = 暂无数据</div><button class="btn ghost small" id="btnCopyTuanchou">📋 复制</button></div></div>
+<div class="toast" id="toast">已复制</div>
+<script>
+(function(){
+  const $ = (id)=>document.getElementById(id);
+  const el = {
+    orderInput: $('orderInput'),
+    btnPasteAdd: $('btnPasteAdd'),
+    btnLoadSample: $('btnLoadSample'),
+    btnClearInput: $('btnClearInput'),
+    btnParse: $('btnParse'),
+    modeSwitch: $('modeSwitch'),
+    btnExport: $('btnExport'),
+    btnCopySummary: $('btnCopySummary'),
+    commonList: $('commonList'),
+    projectList: $('projectList'),
+    smartList: $('smartList'),
+    metricOrders: $('metricOrders'),
+    metricPeople: $('metricPeople'),
+    metricGroups: $('metricGroups'),
+    metricSmart: $('metricSmart'),
+    toast: $('toast')
+  };
+
+  const SAMPLE_DATA = `派单：佳一
+陪陪：小陈 小鱼诗 emo 小行星 小阮  低频 下雪 小帆 蛋卷 啾啾 雨季 航航
+老板：土豆
+类型：鹅鸭杀
+时长：2h
+总价：739.2
+团抽：36.96
+派抽：147.84
+到手：46.2
+备注：88折
+
+派单：佳一
+陪陪：西西
+老板：土豆
+类型：鹅鸭杀
+时长：1.5h
+总价：46.2
+团抽：2.31
+派抽：9.24
+到手：34.65
+备注：88折
+
+派单：佳一
+陪陪：啾啾 小鱼诗 蛋卷 emo 小阮 低频 布奇 小玖 kill 航航 小阵 小行星 小逸 下雪 西西 雨季 安然 小梦
+老板：土豆
+类型：礼物
+时长：
+总价：378
+团抽：37.8
+派抽：75.6
+到手：14.7
+备注：
+
+派单：佳一
+陪陪：小陈
+老板：土豆
+类型：鹅鸭杀
+时长：1h
+总价：30.8
+团抽：1.54
+派抽：6.16
+到手：23.1
+备注：88折
+
+派单：佳一
+陪陪：安然 西西 啾啾 小鱼诗 蛋卷 雨季 小帆 小行星 低频 小逸
+老板：土豆
+类型：鹅鸭杀
+时长：2h
+总价：616
+团抽：30.8
+派抽：123.2
+到手：46.2
+备注：88折
+
+派单：佳一
+陪陪：小陈
+老板：土豆
+类型：鹅鸭杀
+时长：1h
+总价：30.8
+团抽：1.54
+派抽：6.16
+到手：23.1
+备注：88折
+
+派单：佳一
+陪陪：啾啾 小鱼诗 蛋卷 emo 小阮 低频 布奇 小玖 kill 航航 小阵 小行星 小逸 下雪 西西 雨季 安然 小梦
+老板：土豆
+类型：礼物
+时长：
+总价：378
+团抽：37.8
+派抽：75.6
+到手：14.7
+备注：
+
+派单：佳一
+陪陪：西西
+老板：土豆
+类型：鹅鸭杀
+时长：1.5h
+总价：46.2
+团抽：2.31
+派抽：9.24
+到手：34.65
+备注：88折
+
+派单：佳一
+陪陪：小陈 小鱼诗 emo 小行星 小阮  低频 下雪 小帆 蛋卷 啾啾 雨季 航航
+老板：土豆
+类型：鹅鸭杀
+时长：2h
+总价：739.2
+团抽：36.96
+派抽：147.84
+到手：46.2
+备注：88折`;
+
+  const state = {
+    mode: 'common',
+    orders: [],
+    people: [],
+    projectGroups: [],
+    smartGroups: { groupUnits: [], soloUnits: [] }
+  };
+
+  const amountFields = { '总价':'totalPrice', '团抽':'tuanchou', '派抽':'paichou', '到手':'daoshou' };
+
+  function toast(msg){
+    el.toast.textContent = msg;
+    el.toast.classList.add('show');
+    clearTimeout(el.toast._t);
+    el.toast._t = setTimeout(()=>el.toast.classList.remove('show'), 1650);
+  }
+
+  function formatAmount(n){
+    if (n === null || n === undefined || n === '' || Number.isNaN(n)) return '0';
+    if (typeof n === 'string') n = Number(n.replace(/[，,\s]/g,''));
+    if (!Number.isFinite(n)) return '0';
+    n = Number(n.toFixed(10));
+    let s = String(n);
+    if (/[eE]/.test(s)) s = n.toFixed(10);
+    s = s.replace(/\.?0+$/,'');
+    return s === '-0' ? '0' : s;
+  }
+
+  function amountKey(n){
+    const v = Number(n);
+    if (!Number.isFinite(v)) return '0.00';
+    return (Math.round(v * 100) / 100).toFixed(2);
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function parseAmount(str){
+    if (!str || !String(str).trim()) return NaN;
+    return Number(String(str).replace(/[，,\s]/g,''));
+  }
+
+  function makeOrderLabel(order, index){
+    const a = order.paidan || '未知派单';
+    const b = order.boss || '未知老板';
+    const c = order.type || '未填类型';
+    const d = order.time || '';
+    return `${index + 1}. ${a} / ${b} / ${c}${d ? ' / ' + d : ''}`;
+  }
+
+  function parseOrders(text){
+    if (!text || !text.trim()) return [];
+    return text
+      .split(/\n\s*\n/)
+      .map(block => block.trim())
+      .filter(Boolean)
+      .map((block, index) => {
+        const order = {
+          index,
+          paidan: '',
+          peipei: [],
+          boss: '',
+          type: '',
+          time: '',
+          remark: '',
+          totalPrice: NaN,
+          tuanchou: NaN,
+          paichou: NaN,
+          daoshou: NaN
+        };
+        block.split('\n').map(s => s.trim()).filter(Boolean).forEach(line => {
+          const m = line.match(/^(.+?)[：:]\s*(.*)$/);
+          if (!m) return;
+          const field = m[1].trim();
+          const val = m[2].trim();
+          if (field === '派单') order.paidan = val;
+          else if (field === '陪陪') order.peipei = val ? val.split(/\s+/).filter(Boolean) : [];
+          else if (field === '老板') order.boss = val;
+          else if (field === '类型') order.type = val;
+          else if (field === '时长') order.time = val;
+          else if (field === '备注') order.remark = val;
+          else if (Object.prototype.hasOwnProperty.call(amountFields, field)) order[amountFields[field]] = parseAmount(val);
+        });
+        return order;
+      })
+      .filter(o => o.peipei.length > 0 && Number.isFinite(o.daoshou));
+  }
+
+  function aggregatePeople(orders){
+    const map = new Map();
+    orders.forEach((order, oi) => {
+      const amount = Number(order.daoshou);
+      const label = makeOrderLabel(order, oi);
+      order.peipei.forEach(name => {
+        if (!map.has(name)){
+          map.set(name, { name, total: 0, items: [] });
+        }
+        const p = map.get(name);
+        p.total = Number((p.total + amount).toFixed(10));
+        p.items.push({
+          label,
+          amount,
+          orderIndex: oi,
+          orderType: order.type,
+          boss: order.boss,
+          paidan: order.paidan
+        });
+      });
+    });
+    return [...map.values()].sort((a,b) => b.total - a.total || a.name.localeCompare(b.name,'zh-Hans-CN'));
+  }
+
+  function buildProjectGroups(orders){
+    return orders.map((order, oi) => {
+      const amount = Number(order.daoshou);
+      const participants = [...order.peipei];
+      const totalForOrder = Number((participants.length * amount).toFixed(10));
+      return {
+        key: oi,
+        order,
+        label: makeOrderLabel(order, oi),
+        participants,
+        amount,
+        totalForOrder
+      };
+    });
+  }
+
+  // 智能结账 2.2：以劳动力为目标的跨群组合优化
+  // 成本模型：建一个群聊 = 3；一次单独转账 = 1。
+  // 同一陪玩可加入多个群聊；群内成员领取相同金额；不足部分最多保留一次单独转账。
+  function buildSmartGroups(orders, people){
+    const GROUP_COST = 3;
+    const MIN_GROUP_SIZE = 3;
+    const cents = n => Math.round(Number(n || 0) * 100);
+    const totals = people.map(p => ({...p, cents: cents(p.total)}));
+    if (!totals.length) return { groupUnits: [], soloUnits: [], labor: 0, baseline: 0, exact: true };
+
+    // 原订单中“相同人员集合+相同单价”的项目先叠加，作为高价值候选金额。
+    const merged = new Map();
+    orders.forEach(o => {
+      if (o.peipei.length < MIN_GROUP_SIZE) return;
+      const names=[...new Set(o.peipei)].sort();
+      const key = names.join('|') + '::' + cents(o.daoshou);
+      if(!merged.has(key)) merged.set(key,{amount:0,people:names});
+      merged.get(key).amount += cents(o.daoshou);
+    });
+    const sourceCandidates = [...new Set([...merged.values()].map(v=>v.amount))].filter(v => v > 0);
+    const sourceMembers = new Map();
+    [...merged.values()].forEach(v=>{
+      if(!sourceMembers.has(v.amount)) sourceMembers.set(v.amount,new Set());
+      v.people.forEach(n=>sourceMembers.get(v.amount).add(n));
+    });
+
+    // 候选金额来自原项目、个人总额及个人总额之间的差值。
+    const uniqueTotals = [...new Set(totals.map(p => p.cents))].sort((a,b)=>a-b);
+    const candidateSet = new Set(sourceCandidates);
+    uniqueTotals.forEach(v => candidateSet.add(v));
+    for (let i=0;i<uniqueTotals.length;i++){
+      for (let j=0;j<i;j++) candidateSet.add(uniqueTotals[i]-uniqueTotals[j]);
+    }
+
+    const scoreCandidate = amount => {
+      let support = 0;
+      totals.forEach(p => {
+        if (p.cents >= amount) support++;
+        if (p.cents === amount) support += 3;
+      });
+      if (sourceCandidates.includes(amount)) support += 12;
+      return support;
+    };
+    let candidates = [...candidateSet]
+      .filter(v => v > 0 && totals.filter(p => p.cents >= v).length >= MIN_GROUP_SIZE)
+      .sort((a,b) => scoreCandidate(b)-scoreCandidate(a) || a-b);
+    const mustKeep = sourceCandidates.filter(v => candidates.includes(v));
+    candidates = [...new Set([...mustKeep, ...candidates.slice(0, 20)])].sort((a,b)=>a-b);
+
+    function evaluate(amounts){
+      const k = amounts.length;
+      const sums = new Array(1<<k).fill(0);
+      for (let mask=1; mask<(1<<k); mask++){
+        const bit = mask & -mask;
+        const idx = Math.log2(bit)|0;
+        sums[mask] = sums[mask ^ bit] + amounts[idx];
+      }
+      const usage=new Array(k).fill(0);
+      const picked=[];
+      let solos=0;
+      totals.forEach(p => {
+        const options=[];
+        for(let mask=0; mask<(1<<k); mask++){
+          if(sums[mask] <= p.cents){
+            const residual=p.cents-sums[mask];
+            const bits=mask.toString(2).replace(/0/g,'').length;
+            let affinity=0;
+            for(let j=0;j<k;j++) if(mask&(1<<j)){
+              const members=sourceMembers.get(amounts[j]);
+              if(members && members.has(p.name)) affinity++;
+            }
+            // 先消除单独转账；同等劳动力下优先复用原群成员，再减少跨群复杂度。
+            options.push({mask,residual,exact:residual===0,bits,affinity});
+          }
+        }
+        options.sort((a,b)=>Number(b.exact)-Number(a.exact) || b.affinity-a.affinity || b.bits-a.bits || b.residual-a.residual);
+        const chosen=options[0];
+        picked.push(chosen);
+        if(chosen.residual>0) solos++;
+        for(let j=0;j<k;j++) if(chosen.mask&(1<<j)) usage[j]++;
+      });
+      if(usage.some(v=>v<MIN_GROUP_SIZE)) return null;
+      return {amounts, picked, usage, solos, memberTouches:usage.reduce((a,b)=>a+b,0), labor:k*GROUP_COST+solos};
+    }
+
+    let best={amounts:[], picked:totals.map(p=>({mask:0,residual:p.cents})), usage:[], solos:totals.length, labor:totals.length, memberTouches:0};
+    const maxGroups=Math.min(4, Math.floor((totals.length-1)/GROUP_COST), candidates.length);
+    function consider(combo){
+      const result=evaluate(combo);
+      if(!result) return;
+      if(result.labor < best.labor ||
+         (result.labor===best.labor && result.solos<best.solos) ||
+         (result.labor===best.labor && result.solos===best.solos && result.amounts.length<best.amounts.length) ||
+         (result.labor===best.labor && result.solos===best.solos && result.amounts.length===best.amounts.length && result.memberTouches>best.memberTouches)) best=result;
+    }
+    function combine(start, need, combo){
+      if(need===0){ consider([...combo]); return; }
+      for(let i=start;i<=candidates.length-need;i++){
+        combo.push(candidates[i]); combine(i+1,need-1,combo); combo.pop();
+      }
+    }
+    for(let k=1;k<=maxGroups;k++) combine(0,k,[]);
+
+    const groupUnits=best.amounts.map((amount, gi) => ({
+      type:'group',
+      amount:amount/100,
+      people:totals.filter((p,pi)=>best.picked[pi].mask&(1<<gi)).map(p=>p.name),
+      memberCount:best.usage[gi],
+      cost:GROUP_COST
+    })).sort((a,b)=>b.amount-a.amount);
+
+    const soloUnits=[];
+    totals.forEach((p,pi)=>{
+      const residual=best.picked[pi].residual;
+      if(residual>0){
+        const joined=[];
+        best.amounts.forEach((a,gi)=>{ if(best.picked[pi].mask&(1<<gi)) joined.push(a/100); });
+        soloUnits.push({name:p.name,total:residual/100,originalTotal:p.total,joinedGroups:joined,items:p.items});
+      }
+    });
+    soloUnits.sort((a,b)=>b.total-a.total || a.name.localeCompare(b.name,'zh-Hans-CN'));
+    return {groupUnits, soloUnits, labor:best.labor, baseline:totals.length, groupCost:GROUP_COST, minGroupSize:MIN_GROUP_SIZE, exact:true};
+  }
+
+  function cardAccent(idx){
+    const palette = [
+      'linear-gradient(90deg,#3e5f9b,#6d8fd1)',
+      'linear-gradient(90deg,#2f8f6b,#66b994)',
+      'linear-gradient(90deg,#b37b00,#e0b65a)',
+      'linear-gradient(90deg,#8a5bd1,#b58cf0)',
+      'linear-gradient(90deg,#d04f78,#ef86a5)'
+    ];
+    return palette[idx % palette.length];
+  }
+
+  function personCalcLine(person){
+    const sorted = [...person.items].sort((a,b) => a.orderIndex - b.orderIndex);
+    const expr = sorted.map(i => formatAmount(i.amount)).join(' + ');
+    const amount = formatAmount(person.total);
+    const labels = sorted.map(i => `${i.orderType || i.paidan || '订单'} ${formatAmount(i.amount)}`);
+    return {
+      expr,
+      amount,
+      labels
+    };
+  }
+
+  function renderCommon(){
+    if (!state.people.length){
+      el.commonList.innerHTML = '<div class="empty">暂无数据。请先粘贴订单并解析。</div>';
+      return;
+    }
+    el.commonList.innerHTML = state.people.map((p, idx) => {
+      const calc = personCalcLine(p);
+      const accent = cardAccent(idx);
+      const lines = p.items.map((item, i) => `<span class="mini">${escapeHtml(item.orderType || item.paidan || ('订单' + (i+1)))} ${escapeHtml(formatAmount(item.amount))}</span>`).join('');
+      return `
+        <div class="group-card">
+          <div class="group-accent" style="background:${accent}"></div>
+          <div class="body">
+            <div class="group-head">
+              <div>
+                <div class="group-title">${escapeHtml(p.name)} <span class="chip ok">${escapeHtml(formatAmount(p.total))} 元</span></div>
+                <div class="card-desc">累计参与 ${p.items.length} 单，按每单到手金额累加后的个人总收入。</div>
+              </div>
+              <div class="group-meta">
+                <span class="chip">常规结账</span>
+                <span class="chip">单人独立</span>
+              </div>
+            </div>
+            <div class="formula">${escapeHtml(calc.expr)} = <strong>${escapeHtml(calc.amount)}</strong></div>
+            <div class="calc-chip-list">${lines}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderProject(){
+    if (!state.projectGroups.length){
+      el.projectList.innerHTML = '<div class="empty">暂无数据。请先粘贴订单并解析。</div>';
+      return;
+    }
+    el.projectList.innerHTML = state.projectGroups.map((g, idx) => {
+      const order = g.order;
+      const accent = cardAccent(idx);
+      const participants = g.participants.map(n => `<span class="name-tag">${escapeHtml(n)}</span>`).join('');
+      const metaParts = [
+        order.paidan ? `派单：${order.paidan}` : '',
+        order.boss ? `老板：${order.boss}` : '',
+        order.type ? `类型：${order.type}` : '',
+        order.time ? `时长：${order.time}` : '',
+        order.remark ? `备注：${order.remark}` : ''
+      ].filter(Boolean).join(' ｜ ');
+      const totalOrder = formatAmount(g.totalForOrder);
+      const single = formatAmount(g.amount);
+      return `
+        <div class="group-card">
+          <div class="group-accent" style="background:${accent}"></div>
+          <div class="body">
+            <div class="group-head">
+              <div>
+                <div class="group-title">${escapeHtml(g.label)}</div>
+                <div class="card-desc">${escapeHtml(metaParts || '该单未提供额外信息')}</div>
+              </div>
+              <div class="group-meta">
+                <span class="chip primary">同项目结账</span>
+                <span class="chip">${g.participants.length} 人</span>
+                <span class="chip ok">单人 ${single} 元</span>
+              </div>
+            </div>
+            <div class="formula">${escapeHtml(g.participants.length)} 人 × <strong>${escapeHtml(single)}</strong> 元 = <strong>${escapeHtml(totalOrder)}</strong> 元</div>
+            <div class="names">${participants}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderTuanchou(){
+    const amounts = state.orders.map(o => Number(o.tuanchou)).filter(v => Number.isFinite(v));
+    if (!amounts.length){
+      $('tuanchouContent').innerHTML = '团抽总和 = 暂无数据';
+      return;
+    }
+    const total = amounts.reduce((acc, val) => Number((acc + val).toFixed(10)), 0);
+    const expr = amounts.map(formatAmount).join(' + ');
+    $('tuanchouContent').innerHTML = `团抽总和 = ${escapeHtml(expr)} = <strong>${escapeHtml(formatAmount(total))}</strong>`;
+  }
+
+  function renderSmart(){
+    const { groupUnits, soloUnits, labor, baseline } = state.smartGroups;
+    const saved = Math.max(0, baseline - labor);
+    const ok = labor < baseline;
+    el.metricSmart.textContent = state.people.length ? `${labor} 劳动力` : '-';
+    el.metricSmart.style.color = ok ? 'var(--success)' : 'var(--warn)';
+    if (!state.people.length){
+      el.smartList.innerHTML = '<div class="empty">暂无数据。请先粘贴订单并解析。</div>';
+      return;
+    }
+    let html = `<div class="formula" style="margin-bottom:12px">优化目标：<strong>群聊数 × 3 + 单独转账数</strong> 最小。同一陪玩可以出现在多个群聊；群聊至少 3 人。</div>`;
+    if(groupUnits.length){
+      html += `<div class="card-title" style="margin-bottom:8px;font-size:.9rem;color:var(--muted)">💬 最优群聊（${groupUnits.length} 个）</div>`;
+      html += groupUnits.map((g,idx)=>`
+        <div class="group-card">
+          <div class="group-accent" style="background:${cardAccent(idx)}"></div>
+          <div class="body">
+            <div class="group-head">
+              <div class="group-title">群聊 ${String.fromCharCode(65+idx)} · 每人 ${escapeHtml(formatAmount(g.amount))} 元</div>
+              <div class="group-meta"><span class="chip ok">${g.people.length} 人</span><span class="chip warn">3 劳动力</span></div>
+            </div>
+            <div class="names">${g.people.map(n=>`<span class="name-tag">${escapeHtml(n)}</span>`).join('')}</div>
+          </div>
+        </div>`).join('');
+    }
+    if(soloUnits.length){
+      html += `<div class="card-title" style="margin:16px 0 8px;font-size:.9rem;color:var(--muted)">💸 剩余单独转账（${soloUnits.length} 人）</div>`;
+      html += soloUnits.map((s,idx)=>`
+        <div class="group-card">
+          <div class="group-accent" style="background:${cardAccent(groupUnits.length+idx)}"></div>
+          <div class="body">
+            <div class="group-head">
+              <div><div class="group-title">${escapeHtml(s.name)} <span class="chip warn">${escapeHtml(formatAmount(s.total))} 元</span></div>
+              <div class="card-desc">个人总应收 ${escapeHtml(formatAmount(s.originalTotal))} 元${s.joinedGroups.length ? `，已通过群聊领取 ${s.joinedGroups.map(formatAmount).join(' + ')} 元` : ''}</div></div>
+              <div class="group-meta"><span class="chip">单独转账</span><span class="chip warn">1 劳动力</span></div>
+            </div>
+          </div>
+        </div>`).join('');
+    }else{
+      html += `<div class="chip ok" style="margin-top:12px">全部金额已由群聊完整覆盖，无需单独转账</div>`;
+    }
+    html += `<div class="formula" style="margin-top:12px">全员单独需要 ${baseline} 劳动力；当前方案需要 <strong>${labor}</strong>，共节省 <strong>${saved}</strong>。</div>`;
+    el.smartList.innerHTML=html;
+  }
+
+  function renderAll(){
+    state.people = aggregatePeople(state.orders);
+    state.projectGroups = buildProjectGroups(state.orders);
+    state.smartGroups = buildSmartGroups(state.orders, state.people);
+
+    el.metricOrders.textContent = String(state.orders.length);
+    el.metricPeople.textContent = String(state.people.length);
+
+    const { groupUnits, soloUnits } = state.smartGroups;
+    const smartCount = groupUnits.length + soloUnits.length;
+    const groupCount = state.mode === 'common' ? state.people.length : state.mode === 'project' ? state.projectGroups.length : smartCount;
+    el.metricGroups.textContent = String(groupCount);
+
+    if (state.mode === 'smart'){
+      const labor = state.smartGroups.labor || 0;
+      el.metricSmart.textContent = state.people.length ? `${labor} 劳动力` : '-';
+      el.metricSmart.style.color = labor < state.people.length ? 'var(--success)' : 'var(--warn)';
+    } else {
+      el.metricSmart.textContent = state.people.length ? String(state.smartGroups.labor) : '-';
+      el.metricSmart.style.color = 'var(--text)';
+    }
+
+    renderCommon();
+    renderProject();
+    renderSmart();
+    renderTuanchou();
+
+  }
+
+  function buildSummaryText(){
+    if (!state.orders.length) return '暂无数据';
+    const modeName = state.mode === 'common' ? '常规结账' : state.mode === 'project' ? '同项目结账' : '智能结账';
+    const lines = [];
+    lines.push(`模式：${modeName}`);
+    lines.push(`订单数：${state.orders.length}`);
+    lines.push(`陪玩人数：${state.people.length}`);
+    if (state.mode === 'smart'){
+      const { groupUnits, soloUnits, labor } = state.smartGroups;
+      lines.push(`智能结账：${labor} 劳动力（${groupUnits.length} 群聊×3 + ${soloUnits.length} 单独转账）`);
+      groupUnits.forEach((g,i) => lines.push(`群聊${String.fromCharCode(65+i)} 每人${formatAmount(g.amount)}元：${g.people.join('、')}`));
+      soloUnits.forEach(s => lines.push(`单独：${s.name} ${formatAmount(s.total)}元`));
+    }
+    if (state.mode === 'common'){
+      state.people.slice(0, 6).forEach(p => {
+        lines.push(`${p.name}：${formatAmount(p.total)}`);
+      });
+    } else if (state.mode === 'project'){
+      state.projectGroups.slice(0, 6).forEach(g => {
+        lines.push(`${g.label}：${g.participants.length} 人 × ${formatAmount(g.amount)} = ${formatAmount(g.totalForOrder)}`);
+      });
+    }
+    return lines.join('\n');
+  }
+
+  function setMode(mode){
+    state.mode = mode;
+    el.modeSwitch.querySelectorAll('.seg-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === mode);
+    });
+    document.getElementById('view-common').classList.toggle('active', mode === 'common');
+    document.getElementById('view-project').classList.toggle('active', mode === 'project');
+    document.getElementById('view-smart').classList.toggle('active', mode === 'smart');
+    renderAll();
+  }
+
+  function parseAndRender(){
+    const text = el.orderInput.value.trim();
+    if (!text){
+      toast('请先输入订单数据');
+      return;
+    }
+    const orders = parseOrders(text);
+    if (!orders.length){
+      toast('未能解析到有效订单');
+      return;
+    }
+    state.orders = orders;
+    renderAll();
+    toast(`成功解析 ${orders.length} 条订单`);
+  }
+
+  function exportCSV(filename, headers, rows){
+    const csv = '\uFEFF' + [headers.join(',')].concat(rows.map(row =>
+      row.map(v => {
+        const s = String(v ?? '');
+        return /[,"\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+      }).join(',')
+    )).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+    a.download = filename;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  }
+
+  function exportCurrent(){
+    if (!state.orders.length){
+      toast('暂无数据');
+      return;
+    }
+    const mode = state.mode;
+    if (mode === 'common'){
+      exportCSV('常规结账导出.csv', ['陪玩名字', '个人总收入', '计算过程'], state.people.map(p => {
+        const calc = personCalcLine(p);
+        return [p.name, formatAmount(p.total), `${calc.expr} = ${calc.amount}`];
+      }));
+      toast('已导出常规结账');
+    } else if (mode === 'project'){
+      exportCSV('同项目结账导出.csv', ['项目', '陪玩名单', '单人到手', '人数', '项目总额'], state.projectGroups.map(g => [
+        g.label,
+        g.participants.join(' / '),
+        formatAmount(g.amount),
+        g.participants.length,
+        formatAmount(g.totalForOrder)
+      ]));
+      toast('已导出同项目结账');
+    } else {
+      const { groupUnits, soloUnits } = state.smartGroups;
+      const rows = [
+        ...groupUnits.map((g,i) => ['群聊'+String.fromCharCode(65+i), formatAmount(g.amount), g.people.length, g.people.join(' / '), '允许跨群，成本3']),
+        ...soloUnits.map(s => ['单独转账', formatAmount(s.total), 1, s.name, `总应收${formatAmount(s.originalTotal)}；群聊已付${s.joinedGroups.map(formatAmount).join('+') || '0'}`])
+      ];
+      exportCSV('智能结账导出.csv', ['类型', '金额', '人数', '名单', '来源'], rows);
+      toast('已导出智能结账');
+    }
+  }
+
+  function copyText(text, successMessage){
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      toast(successMessage);
+    };
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(() => toast(successMessage)).catch(fallback);
+    else fallback();
+  }
+
+  function copyTuanchou(){
+    const hasOrders = state.orders.length > 0;
+    if (!hasOrders){
+      toast('暂无团抽数据');
+      return;
+    }
+    const parts = state.orders
+      .map(o => Number(o.tuanchou))
+      .filter(v => Number.isFinite(v));
+    if (!parts.length){
+      toast('暂无团抽数据');
+      return;
+    }
+    const total = parts.reduce((a,b)=> Number((a + b).toFixed(10)), 0);
+    const expr = parts.map(formatAmount).join(' + ');
+    const text = `团抽总和 = ${expr} = ${formatAmount(total)}`;
+    copyText(text, '已复制团抽');
+  }
+
+  function copySummary(){
+    const text = buildSummaryText();
+    if (!text || text === '暂无数据'){
+      toast('暂无可复制内容');
+      return;
+    }
+    copyText(text, '已复制汇总文案');
+  }
+
+  async function pasteAdd(){
+    try{
+      if (!navigator.clipboard?.readText){
+        toast('当前环境不支持剪贴板，请手动粘贴');
+        return;
+      }
+      const text = await navigator.clipboard.readText();
+      if (!text || !text.trim()){
+        toast('剪贴板为空');
+        return;
+      }
+      const current = el.orderInput.value.trim();
+      el.orderInput.value = current ? `${current}\n\n${text.trim()}` : text.trim();
+      toast('已追加粘贴');
+    }catch(e){
+      toast('读取剪贴板失败');
+    }
+  }
+
+  el.modeSwitch.addEventListener('click', (e) => {
+    const btn = e.target.closest('.seg-btn');
+    if (!btn) return;
+    setMode(btn.dataset.mode);
+  });
+
+  el.btnParse.addEventListener('click', parseAndRender);
+  el.btnLoadSample.addEventListener('click', () => { el.orderInput.value = SAMPLE_DATA; parseAndRender(); });
+  el.btnClearInput.addEventListener('click', () => { el.orderInput.value = ''; state.orders = []; state.people = []; state.projectGroups = []; state.smartGroups = { groupUnits: [], soloUnits: [], labor: 0, baseline: 0, groupCost: 3 }; renderAll(); toast('已清空'); });
+  el.btnPasteAdd.addEventListener('click', pasteAdd);
+  el.btnExport.addEventListener('click', exportCurrent);
+  el.btnCopySummary.addEventListener('click', copySummary);
+  $('btnCopyTuanchou').addEventListener('click', copyTuanchou);
+
+  el.orderInput.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+      e.preventDefault();
+      parseAndRender();
+    }
+  });
+
+  // 初始状态
+  renderAll();
+  setMode('smart');
+})();
+</script>
+</body>
+</html>
